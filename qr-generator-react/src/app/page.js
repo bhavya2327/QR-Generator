@@ -5,6 +5,8 @@ import QRCodePreview from '../components/QRCodePreview';
 import { handleSingleDownload } from '../utils/qrUtils';
 import Papa from 'papaparse';
 import QRCodeStyling from 'qr-code-styling';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 export default function Page() {
     
@@ -189,27 +191,27 @@ END:VCARD`;
         setBulkFilename(file.name);
         const config = bulkColumnConfig[activeTab];
         
-        import('papaparse').then((Papa) => {
-            Papa.default.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    const records = results.data.map((row, idx) => {
-                        // Build a display summary from the first column value
-                        const firstCol = config.columns[0];
-                        const displayVal = row[firstCol] || '(empty)';
-                        return {
-                            index: idx + 1,
-                            data: row,
-                            display: displayVal,
-                            status: config.validate(row) ? 'Valid' : 'Invalid'
-                        };
-                    });
-                    setBulkRecords(records);
-                    setBulkStage('preview');
-                    setShowBulkModal(true);
-                }
-            });
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            // Convert header to lowercase and trim spaces to be more forgiving
+            transformHeader: (header) => header.trim().toLowerCase(),
+            complete: (results) => {
+                const records = results.data.map((row, idx) => {
+                    // Build a display summary from the first column value
+                    const firstCol = config.columns[0];
+                    const displayVal = row[firstCol] || '(empty)';
+                    return {
+                        index: idx + 1,
+                        data: row,
+                        display: displayVal,
+                        status: config.validate(row) ? 'Valid' : 'Invalid'
+                    };
+                });
+                setBulkRecords(records);
+                setBulkStage('preview');
+                setShowBulkModal(true);
+            }
         });
     };
 
@@ -220,8 +222,6 @@ END:VCARD`;
         setBulkStage('generating');
         
         try {
-            const JSZip = (await import('jszip')).default;
-            const QRCodeStyling = (await import('qr-code-styling')).default;
             const zip = new JSZip();
             const total = validRecords.length;
 
@@ -243,7 +243,6 @@ END:VCARD`;
             }
 
             const content = await zip.generateAsync({ type: "blob" });
-            const { saveAs } = await import('file-saver');
             saveAs(content, `bulk-qrs-${bulkFormat}.zip`);
             
             setBulkStage('done');
@@ -432,7 +431,7 @@ END:VCARD`;
                             <input type="file" id="csv-file" accept=".csv" style={{ display: "none" }} onChange={onFileUpload} />
                         </div>
                         <div className="text-center mt-3">
-                            <a href={`/sample_${activeTab}.csv`} download={`sample_${activeTab}.csv`} className="text-muted">Download Sample CSV Format</a>
+                            <a href={`/QR-Generator/sample_${activeTab}.csv`} download={`sample_${activeTab}.csv`} className="text-muted">Download Sample CSV Format</a>
                         </div>
                         <div id="bulk-error-message" className="text-danger mt-2 text-center"></div>
                     </div>
