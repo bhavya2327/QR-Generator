@@ -1,0 +1,399 @@
+:root {
+    --primary-color: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --secondary-color: #64748b;
+    --secondary-hover: #475569;
+    --bg-color: #f8fafc;
+    --text-main: #0f172a;
+    --card-bg: #ffffff;
+    --border-color: #cbd5e1;
+}
+
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.navbar {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.content {
+    flex: 1;
+    padding: 2rem 1.5rem;
+}
+
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-hover);
+}
+
+.footer {
+    text-align: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+}
+
+/* Forms & Utilities */
+.form-group {
+    margin-bottom: 1rem;
+}
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+.form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-main);
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+.w-100 { width: 100%; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.text-danger { color: #dc2626; }
+.text-muted { color: #64748b; }
+.text-center { text-align: center; }
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.d-flex { display: flex; }
+.gap-2 { gap: 0.5rem; }
+.justify-content-center { justify-content: center; }
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.btn-outline:hover {
+    background-color: var(--bg-color);
+}
+.qr-preview-box {
+    margin: 1.5rem auto;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    display: inline-block;
+    max-width: 100%;
+}
+.qr-preview-box svg {
+    max-width: 100%;
+    height: auto;
+}
+.drop-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background-color: var(--bg-color);
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.drop-zone.dragover {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary-color);
+}
+.drop-zone p {
+    margin: 0.5rem 0;
+    color: var(--secondary-color);
+}
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.mb-2 { margin-bottom: 0.5rem; }
+.m-0 { margin: 0; }
+.badge {
+    background-color: var(--bg-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+}
+.table-responsive {
+    overflow-x: auto;
+    max-height: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+.table th, .table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+.table th {
+    background-color: var(--bg-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+.status-Valid { color: #16a34a; font-weight: 500; }
+.status-Invalid { color: #dc2626; font-weight: 500; }
+
+.progress-bar-bg {
+    width: 100%;
+    background-color: var(--border-color);
+    border-radius: 9999px;
+    height: 1rem;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    background-color: var(--primary-color);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+.qr-grid-card {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.qr-grid-card svg {
+    max-width: 150px;
+    height: auto;
+    margin: 0 auto 1rem auto;
+}
+
+.type-tabs {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.type-tabs::-webkit-scrollbar {
+    display: none;
+}
+.type-btn {
+    border-radius: 9999px;
+    padding: 0.375rem 1rem;
+    font-weight: 500;
+}
+.custom-accordion > summary {
+    list-style: none;
+}
+.custom-accordion > summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Custom overrides */
+body {
+    background-color: #f3e8ff; /* Baby purple color */
+    color: #1e1e2f; /* Darker text for light background */
+}
+
+/* Make sure cards have a slight opacity or shadow so they stand out against the rich background */
+.card {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Override Bootstrap's green success buttons with Neon Blue to match the background */
+.btn-success {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+}
+
+/* Ensure responsiveness for the main container on mobile */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    /* Stack the side-by-side components on mobile */
+    .row {
+        flex-direction: column;
+    }
+    
+    .col-md-4, .col-md-8, .col-md-6 {
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Glassmorphism Classes for panels */
+.bg-transparent-glass {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px);
+    color: #1e1e2f;
+}
+
+.bg-transparent-glass-header {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px);
+    color: #1e1e2f;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    color: #1e1e2f;
+}
+
+/* Fix text colors */
+.text-muted {
+    color: #64748b !important;
+}
+h5 {
+    color: #1e1e2f !important;
+}
+
+/* Inputs on dark theme */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    color: #1e1e2f !important;
+}
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    color: #1e1e2f !important;
+}
+.form-control::placeholder {
+    color: #94a3b8 !important;
+}
+.form-select option {
+    background-color: #1e293b;
+    color: #fff;
+}
+
+/* Override Bootstrap Primary Colors */
+.btn-primary, .btn-primary:active, .btn-primary:focus {
+    background-color: #8b5cf6 !important;
+    border-color: #7c3aed !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: #7c3aed !important;
+    border-color: #6d28d9 !important;
+}
+
+.text-primary {
+    color: #8b5cf6 !important;
+}
+
+.bg-primary {
+    background-color: #8b5cf6 !important;
+}
+
+/* Override Bootstrap Toggle Switch (Radio Button) */
+.form-check-input:checked {
+    background-color: #8b5cf6 !important;
+    border-color: #7c3aed !important;
+}
+
+.form-check-input:focus {
+    border-color: #a78bfa !important;
+    box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25) !important;
+}
+
+/* Also fix the drag-and-drop zone border when active */
+.drop-zone.dragover {
+    background-color: rgba(139, 92, 246, 0.05) !important;
+    border-color: #8b5cf6 !important;
+}
+
+.btn-primary.active, .btn-primary:active {
+    background-color: #8b5cf6 !important;
+    border-color: #7c3aed !important;
+    color: white !important;
+}
