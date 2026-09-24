@@ -1,0 +1,4 @@
+first_name,last_name,phone,email,company,description,photo_url
+John,Doe,+1234567890,john@example.com,Acme Corp,Sales Manager,https://example.com/john.jpg
+Jane,Smith,+9876543210,jane@company.com,Tech Inc,Lead Developer,https://example.com/jane.jpg
+Bob,Wilson,+4455667788,bob@startup.io,StartupXYZ,Co-Founder,https://example.com/bob.jpg
