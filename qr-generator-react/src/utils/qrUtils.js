@@ -10,6 +10,7 @@ export const handleSingleDownload = (format, data, fgColor, bgColor, bodyShape, 
         type: "svg",
         data: data || "https://example.com",
         image: logoFile,
+        qrOptions: { errorCorrectionLevel: 'H' },
         dotsOptions: {
             color: fgColor,
             type: bodyShape
@@ -23,7 +24,7 @@ export const handleSingleDownload = (format, data, fgColor, bgColor, bodyShape, 
             type: eyeBallShape
         },
         backgroundOptions: { color: bgColor },
-        imageOptions: { crossOrigin: "anonymous", margin: 5 }
+        imageOptions: { crossOrigin: "anonymous", margin: 5, imageSize: 0.4 }
     });
 
     qrCode.download({ name: "qr-code", extension: format });

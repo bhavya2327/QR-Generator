@@ -1,4 +1,2 @@
-email,subject,body
-john@example.com,Meeting Tomorrow,Let's meet at 10am
-hr@company.com,Job Application,Please find my resume attached
-support@shop.com,Order Issue,My order #123 has not arrived
+email,subject,body,logo_url
+test@example.com,Hello,How are you?,

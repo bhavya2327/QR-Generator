@@ -1,4 +1,2 @@
-url
-https://example.com
-https://google.com
-https://github.com
+url,logo_url
+https://example.com,https://i.imgur.com/your-logo.png

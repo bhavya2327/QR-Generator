@@ -13,6 +13,7 @@ export default function QRCodePreview({ data, fgColor, bgColor, bodyShape, eyeFr
             type: "svg",
             data: data || "https://example.com",
             image: logoFile,
+            qrOptions: { errorCorrectionLevel: 'H' },
             dotsOptions: {
                 color: fgColor,
                 type: bodyShape
@@ -30,7 +31,8 @@ export default function QRCodePreview({ data, fgColor, bgColor, bodyShape, eyeFr
             },
             imageOptions: {
                 crossOrigin: "anonymous",
-                margin: 5
+                margin: 5,
+                imageSize: 0.4
             }
         });
         
@@ -48,6 +50,7 @@ export default function QRCodePreview({ data, fgColor, bgColor, bodyShape, eyeFr
         qrCode.current.update({
             data: data || "https://example.com",
             image: logoFile,
+            qrOptions: { errorCorrectionLevel: 'H' },
             dotsOptions: {
                 color: fgColor,
                 type: bodyShape
@@ -62,6 +65,11 @@ export default function QRCodePreview({ data, fgColor, bgColor, bodyShape, eyeFr
             },
             backgroundOptions: {
                 color: bgColor,
+            },
+            imageOptions: {
+                crossOrigin: "anonymous",
+                margin: 5,
+                imageSize: 0.4
             }
         });
     }, [data, fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, logoFile]);

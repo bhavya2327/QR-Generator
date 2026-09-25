@@ -25,6 +25,7 @@ export default function Page() {
 
     const [eyeFrameShape, setEyeFrameShape] = useState('square');
     const [eyeBallShape, setEyeBallShape] = useState('square');
+    const [centerLogo, setCenterLogo] = useState(null);
 
     // Data States
     const [url, setUrl] = useState('https://example.com');
@@ -45,7 +46,6 @@ export default function Page() {
     const [vcardEmail, setVcardEmail] = useState('');
     const [vcardCompany, setVcardCompany] = useState('');
     const [vcardDesc, setVcardDesc] = useState('');
-    const [vcardPhotoBase64, setVcardPhotoBase64] = useState('');
     const [vcardJob, setVcardJob] = useState('');
     const [vcardStreet, setVcardStreet] = useState('');
     const [vcardCity, setVcardCity] = useState('');
@@ -53,6 +53,10 @@ export default function Page() {
     const [vcardState, setVcardState] = useState('');
     const [vcardCountry, setVcardCountry] = useState('');
     const [vcardWebsite, setVcardWebsite] = useState('');
+    const [vcardLinkedIn, setVcardLinkedIn] = useState('');
+    const [vcardInstagram, setVcardInstagram] = useState('');
+    const [vcardFacebook, setVcardFacebook] = useState('');
+    const [vcardYoutube, setVcardYoutube] = useState('');
     
     // Location
     const [locStreet, setLocStreet] = useState('');
@@ -77,33 +81,20 @@ export default function Page() {
         return url;
     };
 
-    // Handle vCard photo file upload - resize and convert to base64
-    const handleVcardPhotoUpload = (e) => {
+    const handleCenterLogoUpload = (e) => {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) {
+            setCenterLogo(null);
+            return;
+        }
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const size = 80; // Small size to keep QR scannable
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                // Center crop
-                const min = Math.min(img.width, img.height);
-                const sx = (img.width - min) / 2;
-                const sy = (img.height - min) / 2;
-                ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
-                // Get base64 (strip the data:image/jpeg;base64, prefix)
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
-                const base64 = dataUrl.split(',')[1];
-                setVcardPhotoBase64(base64);
-            };
-            img.src = ev.target.result;
+            setCenterLogo(ev.target.result);
         };
         reader.readAsDataURL(file);
     };
+
+
 
     const getQrData = () => {
         if (activeTab === 'url') return url || 'https://example.com';
@@ -118,13 +109,12 @@ N:${vcardLast};${vcardFirst}
 FN:${vcardFirst} ${vcardLast}
 ORG:${vcardCompany}
 TITLE:${vcardJob}
-NOTE:${vcardDesc}${vcardPhotoBase64 ? `\nPHOTO;ENCODING=b;TYPE=JPEG:${vcardPhotoBase64}` : ''}
+NOTE:${vcardDesc}
 TEL;TYPE=work,voice:${vcardPhone}
 TEL;TYPE=cell,voice:${vcardMobile}
 TEL;TYPE=fax:${vcardFax}
 EMAIL:${vcardEmail}
-URL:${vcardWebsite}
-ADR;TYPE=work:;;${vcardStreet};${vcardCity};${vcardState};${vcardZip};${vcardCountry}
+${vcardWebsite ? `URL:${vcardWebsite}\n` : ''}${vcardLinkedIn ? `X-SOCIALPROFILE;type=linkedin:${vcardLinkedIn}\n` : ''}${vcardInstagram ? `X-SOCIALPROFILE;type=instagram:${vcardInstagram}\n` : ''}${vcardFacebook ? `X-SOCIALPROFILE;type=facebook:${vcardFacebook}\n` : ''}${vcardYoutube ? `X-SOCIALPROFILE;type=youtube:${vcardYoutube}\n` : ''}ADR;TYPE=work:;;${vcardStreet};${vcardCity};${vcardState};${vcardZip};${vcardCountry}
 END:VCARD`;
         }
         if (activeTab === 'location') {
@@ -153,14 +143,14 @@ END:VCARD`;
 
     // Define expected columns and validation per tab
     const bulkColumnConfig = {
-        url: { columns: ['url'], label: 'URL', validate: (row) => row.url && row.url.startsWith('http') },
-        text: { columns: ['text'], label: 'Text', validate: (row) => row.text && row.text.trim().length > 0 },
-        email: { columns: ['email', 'subject', 'body'], label: 'Email', validate: (row) => row.email && row.email.includes('@') },
-        phone: { columns: ['phone'], label: 'Phone', validate: (row) => row.phone && row.phone.trim().length > 0 },
-        sms: { columns: ['phone', 'message'], label: 'SMS', validate: (row) => row.phone && row.phone.trim().length > 0 },
-        vcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'photo_url'], label: 'vCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
-        location: { columns: ['street', 'city', 'state', 'zip'], label: 'Location', validate: (row) => (row.street || row.city) && (row.street + row.city).trim().length > 0 },
-        event: { columns: ['name', 'location', 'start', 'end'], label: 'Event', validate: (row) => row.name && row.name.trim().length > 0 },
+        url: { columns: ['url', 'logo_url'], label: 'URL', validate: (row) => row.url && row.url.startsWith('http') },
+        text: { columns: ['text', 'logo_url'], label: 'Text', validate: (row) => row.text && row.text.trim().length > 0 },
+        email: { columns: ['email', 'subject', 'body', 'logo_url'], label: 'Email', validate: (row) => row.email && row.email.includes('@') },
+        phone: { columns: ['phone', 'logo_url'], label: 'Phone', validate: (row) => row.phone && row.phone.trim().length > 0 },
+        sms: { columns: ['phone', 'message', 'logo_url'], label: 'SMS', validate: (row) => row.phone && row.phone.trim().length > 0 },
+        vcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'logo_url'], label: 'vCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
+        location: { columns: ['street', 'city', 'state', 'zip', 'logo_url'], label: 'Location', validate: (row) => (row.street || row.city) && (row.street + row.city).trim().length > 0 },
+        event: { columns: ['name', 'location', 'start', 'end', 'logo_url'], label: 'Event', validate: (row) => row.name && row.name.trim().length > 0 },
     };
 
     // Convert a parsed CSV row into QR-encodable data based on the active tab
@@ -171,8 +161,9 @@ END:VCARD`;
         if (tab === 'phone') return `tel:${row.phone}`;
         if (tab === 'sms') return `smsto:${row.phone || ''}:${row.message || ''}`;
         if (tab === 'vcard') {
-            const photoLine = row.photo_url ? `\nPHOTO;VALUE=URI:${toDirectPhotoUrl(row.photo_url)}` : '';
-            return `BEGIN:VCARD\nVERSION:3.0\nN:${row.last_name || ''};${row.first_name || ''}\nFN:${row.first_name || ''} ${row.last_name || ''}\nORG:${row.company || ''}\nNOTE:${row.description || ''}${photoLine}\nTEL:${row.phone || ''}\nEMAIL:${row.email || ''}\nEND:VCARD`;
+            const getSocial = (type, val) => val ? `X-SOCIALPROFILE;type=${type}:${val}\n` : '';
+            const website = row.website ? `URL:${row.website}\n` : '';
+            return `BEGIN:VCARD\nVERSION:3.0\nN:${row.last_name || ''};${row.first_name || ''}\nFN:${row.first_name || ''} ${row.last_name || ''}\nORG:${row.company || ''}\nNOTE:${row.description || ''}\nTEL:${row.phone || ''}\nEMAIL:${row.email || ''}\n${website}${getSocial('linkedin', row.linkedin)}${getSocial('instagram', row.instagram)}${getSocial('facebook', row.facebook)}${getSocial('youtube', row.youtube)}END:VCARD`;
         }
         if (tab === 'location') {
             const query = encodeURIComponent(`${row.street || ''} ${row.city || ''} ${row.state || ''} ${row.zip || ''}`.trim());
@@ -226,13 +217,19 @@ END:VCARD`;
             const total = validRecords.length;
 
             for (let i = 0; i < total; i++) {
-                const qrData = rowToQrData(validRecords[i].data, activeTab);
+                const rowData = validRecords[i].data;
+                const qrData = rowToQrData(rowData, activeTab);
+                const rowLogoUrl = rowData.logo_url ? toDirectPhotoUrl(rowData.logo_url) : centerLogo;
+
                 const qrCode = new QRCodeStyling({
                     width: 300, height: 300, type: "svg", data: qrData,
+                    image: rowLogoUrl,
+                    qrOptions: { errorCorrectionLevel: 'H' },
                     dotsOptions: { color: fgColor, type: bodyShape },
                     cornersSquareOptions: { color: fgColor, type: eyeFrameShape },
                     cornersDotOptions: { color: fgColor, type: eyeBallShape },
-                    backgroundOptions: { color: bgColor }
+                    backgroundOptions: { color: bgColor },
+                    imageOptions: { crossOrigin: "anonymous", margin: 5, imageSize: 0.4 }
                 });
 
                 const blob = await qrCode.getRawData(bulkFormat);
@@ -373,6 +370,30 @@ END:VCARD`;
                                 <label htmlFor="vcard_desc" className="text-muted mb-1">Description</label>
                                 <textarea id="vcard_desc" name="vcard_desc" className="form-control" rows="3" value={vcardDesc} onChange={(e) => setVcardDesc(e.target.value)}></textarea>
                             </div>
+                            <div className="col-md-12 mt-4 mb-2">
+                                <h6>Social Media & Links</h6>
+                                <hr className="mt-1 mb-3" />
+                            </div>
+                            <div className="col-md-6 form-group mb-2">
+                                <label htmlFor="vcard_website" className="text-muted mb-1">Company / Website URL</label>
+                                <input type="url" id="vcard_website" className="form-control" placeholder="https://" value={vcardWebsite} onChange={(e) => setVcardWebsite(e.target.value)} />
+                            </div>
+                            <div className="col-md-6 form-group mb-2">
+                                <label htmlFor="vcard_linkedin" className="text-muted mb-1">LinkedIn URL</label>
+                                <input type="url" id="vcard_linkedin" className="form-control" placeholder="https://" value={vcardLinkedIn} onChange={(e) => setVcardLinkedIn(e.target.value)} />
+                            </div>
+                            <div className="col-md-6 form-group mb-2">
+                                <label htmlFor="vcard_facebook" className="text-muted mb-1">Facebook URL</label>
+                                <input type="url" id="vcard_facebook" className="form-control" placeholder="https://" value={vcardFacebook} onChange={(e) => setVcardFacebook(e.target.value)} />
+                            </div>
+                            <div className="col-md-6 form-group mb-2">
+                                <label htmlFor="vcard_instagram" className="text-muted mb-1">Instagram URL</label>
+                                <input type="url" id="vcard_instagram" className="form-control" placeholder="https://" value={vcardInstagram} onChange={(e) => setVcardInstagram(e.target.value)} />
+                            </div>
+                            <div className="col-md-6 form-group mb-2">
+                                <label htmlFor="vcard_youtube" className="text-muted mb-1">YouTube URL</label>
+                                <input type="url" id="vcard_youtube" className="form-control" placeholder="https://" value={vcardYoutube} onChange={(e) => setVcardYoutube(e.target.value)} />
+                            </div>
                         </div>
                     </div>
 
@@ -466,9 +487,12 @@ END:VCARD`;
                 </div>
                 <div className={`p-4 bg-transparent-glass ${isLogoOpen ? '' : 'd-none'} border-start border-end border-bottom mb-2`} id="logo-section">
                     <div className="form-group mb-0">
-                        <label htmlFor="logo_file" className="text-muted mb-2">Upload Logo (.png)</label>
-                        <input type="file" id="logo_file" name="logo_file" className="form-control" accept="image/png" />
+                        <label htmlFor="logo_file" className="text-muted mb-2">Upload Logo (.png, .jpg)</label>
+                        <input type="file" id="logo_file" name="logo_file" className="form-control" accept="image/png, image/jpeg" onChange={handleCenterLogoUpload} />
                         <small className="text-muted mt-1 d-block">A white margin will be added around the logo for readability.</small>
+                        {centerLogo && (
+                            <button className="btn btn-sm btn-outline-danger mt-2" onClick={() => { setCenterLogo(null); document.getElementById('logo_file').value = ''; }}>Remove Logo</button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -521,7 +545,7 @@ END:VCARD`;
                         fgColor={fgColor} 
                         bgColor={bgColor} 
                         bodyShape={bodyShape} eyeFrameShape={eyeFrameShape} eyeBallShape={eyeBallShape} 
-                        logoFile={null} 
+                        logoFile={centerLogo} 
                     />
                 </div>
 
@@ -529,8 +553,8 @@ END:VCARD`;
                 
                 <div id="download-actions"  className="mt-3">
                     <div className="d-flex gap-2">
-                        <button className="btn btn-primary flex-grow-1" onClick={() => handleSingleDownload("png", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, null)}>Download PNG</button>
-                        <button className="btn btn-secondary flex-grow-1" onClick={() => handleSingleDownload("svg", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, null)}>Download SVG</button>
+                        <button className="btn btn-primary flex-grow-1" onClick={() => handleSingleDownload("png", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download PNG</button>
+                        <button className="btn btn-secondary flex-grow-1" onClick={() => handleSingleDownload("svg", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download SVG</button>
                     </div>
                 </div>
 
@@ -551,7 +575,7 @@ END:VCARD`;
 {/* Dynamic React Bulk Modal */}
 {showBulkModal && (
     <div className="position-fixed w-100 h-100 d-flex" style={{ top: 0, left: 0, background: "rgba(0,0,0,0.6)", zIndex: 1050, alignItems: "center", justifyContent: "center" }}>
-        <div className="card p-4 shadow-lg" style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', backgroundColor: '#ffffff' }}>
+        <div className="bg-white rounded p-4 shadow-lg" style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
             <button onClick={() => setShowBulkModal(false)} className="btn btn-sm btn-outline text-muted" style={{ position: 'absolute', top: '1rem', right: '1rem' }}>✕ Close</button>
             
             <h3 className="mb-3">Bulk CSV Preview</h3>
