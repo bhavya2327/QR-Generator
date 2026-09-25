@@ -1,4 +1,2 @@
-phone,message
-+1234567890,Your OTP is 4567
-+9876543210,Meeting at 3pm today
-+4455667788,Happy Birthday!
+phone,message,logo_url
++1234567890,"Hello!",

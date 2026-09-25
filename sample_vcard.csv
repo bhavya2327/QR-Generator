@@ -1,4 +1,2 @@
-first_name,last_name,phone,email,company,description,photo_url
-John,Doe,+1234567890,john@example.com,Acme Corp,Sales Manager,https://example.com/john.jpg
-Jane,Smith,+9876543210,jane@company.com,Tech Inc,Lead Developer,https://example.com/jane.jpg
-Bob,Wilson,+4455667788,bob@startup.io,StartupXYZ,Co-Founder,https://example.com/bob.jpg
+first_name,last_name,phone,email,company,description,website,linkedin,facebook,instagram,youtube,logo_url
+John,Doe,+1234567890,john@example.com,Acme Corp,"Software Engineer",https://acme.com,https://linkedin.com/in/johndoe,https://facebook.com/johndoe,https://instagram.com/johndoe,https://youtube.com/johndoe,https://drive.google.com/file/d/1-D4zUQHF6Qh7ziSBM2xYyYP67d29ZqYr/view?usp=sharing

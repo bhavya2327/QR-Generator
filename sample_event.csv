@@ -1,4 +1,2 @@
-name,location,start,end
-Team Meeting,Conference Room A,2025-01-15T10:00,2025-01-15T11:00
-Workshop,Main Hall,2025-02-20T09:00,2025-02-20T17:00
-Birthday Party,Central Park,2025-03-10T18:00,2025-03-10T22:00
+name,location,start,end,logo_url
+"My Event","Central Park",2025-10-31T10:00:00,2025-10-31T12:00:00,
