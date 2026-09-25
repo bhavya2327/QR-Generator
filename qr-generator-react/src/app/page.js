@@ -57,6 +57,7 @@ export default function Page() {
     const [vcardInstagram, setVcardInstagram] = useState('');
     const [vcardFacebook, setVcardFacebook] = useState('');
     const [vcardYoutube, setVcardYoutube] = useState('');
+    const [scPhotoUrl, setScPhotoUrl] = useState('');
     
     // Location
     const [locStreet, setLocStreet] = useState('');
@@ -117,6 +118,16 @@ EMAIL:${vcardEmail}
 ${vcardWebsite ? `URL:${vcardWebsite}\n` : ''}${vcardLinkedIn ? `X-SOCIALPROFILE;type=linkedin:${vcardLinkedIn}\n` : ''}${vcardInstagram ? `X-SOCIALPROFILE;type=instagram:${vcardInstagram}\n` : ''}${vcardFacebook ? `X-SOCIALPROFILE;type=facebook:${vcardFacebook}\n` : ''}${vcardYoutube ? `X-SOCIALPROFILE;type=youtube:${vcardYoutube}\n` : ''}ADR;TYPE=work:;;${vcardStreet};${vcardCity};${vcardState};${vcardZip};${vcardCountry}
 END:VCARD`;
         }
+        if (activeTab === 'smartcard') {
+            const data = {
+                firstName: vcardFirst, lastName: vcardLast, phone: vcardPhone, email: vcardEmail,
+                company: vcardCompany, job: vcardJob, desc: vcardDesc,
+                website: vcardWebsite, linkedin: vcardLinkedIn, facebook: vcardFacebook,
+                instagram: vcardInstagram, youtube: vcardYoutube, photo: scPhotoUrl
+            };
+            const payload = btoa(encodeURIComponent(JSON.stringify(data)));
+            return `${window.location.origin}/QR-Generator/card?data=${payload}`;
+        }
         if (activeTab === 'location') {
             const query = encodeURIComponent(`${locStreet} ${locCity} ${locState} ${locZip}`.trim());
             return query ? `https://www.google.com/maps/search/?api=1&query=${query}` : 'https://www.google.com/maps';
@@ -149,6 +160,7 @@ END:VCARD`;
         phone: { columns: ['phone', 'logo_url'], label: 'Phone', validate: (row) => row.phone && row.phone.trim().length > 0 },
         sms: { columns: ['phone', 'message', 'logo_url'], label: 'SMS', validate: (row) => row.phone && row.phone.trim().length > 0 },
         vcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'logo_url'], label: 'vCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
+        smartcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'photo_url', 'logo_url'], label: 'SmartCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
         location: { columns: ['street', 'city', 'state', 'zip', 'logo_url'], label: 'Location', validate: (row) => (row.street || row.city) && (row.street + row.city).trim().length > 0 },
         event: { columns: ['name', 'location', 'start', 'end', 'logo_url'], label: 'Event', validate: (row) => row.name && row.name.trim().length > 0 },
     };
@@ -164,6 +176,16 @@ END:VCARD`;
             const getSocial = (type, val) => val ? `X-SOCIALPROFILE;type=${type}:${val}\n` : '';
             const website = row.website ? `URL:${row.website}\n` : '';
             return `BEGIN:VCARD\nVERSION:3.0\nN:${row.last_name || ''};${row.first_name || ''}\nFN:${row.first_name || ''} ${row.last_name || ''}\nORG:${row.company || ''}\nNOTE:${row.description || ''}\nTEL:${row.phone || ''}\nEMAIL:${row.email || ''}\n${website}${getSocial('linkedin', row.linkedin)}${getSocial('instagram', row.instagram)}${getSocial('facebook', row.facebook)}${getSocial('youtube', row.youtube)}END:VCARD`;
+        }
+        if (tab === 'smartcard') {
+            const data = {
+                firstName: row.first_name, lastName: row.last_name, phone: row.phone, email: row.email,
+                company: row.company, desc: row.description, website: row.website,
+                linkedin: row.linkedin, facebook: row.facebook, instagram: row.instagram, 
+                youtube: row.youtube, photo: row.photo_url ? toDirectPhotoUrl(row.photo_url) : ''
+            };
+            const payload = btoa(encodeURIComponent(JSON.stringify(data)));
+            return `${window.location.origin}/QR-Generator/card?data=${payload}`;
         }
         if (tab === 'location') {
             const query = encodeURIComponent(`${row.street || ''} ${row.city || ''} ${row.state || ''} ${row.zip || ''}`.trim());
@@ -264,6 +286,7 @@ END:VCARD`;
         <button className={`btn type-btn ${activeTab === "phone" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("phone")}><i className="fas fa-phone"></i> Phone</button>
         <button className={`btn type-btn ${activeTab === "sms" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("sms")}><i className="fas fa-comment"></i> SMS</button>
         <button className={`btn type-btn ${activeTab === "vcard" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("vcard")}><i className="fas fa-id-card"></i> vCard</button>
+        <button className={`btn type-btn ${activeTab === "smartcard" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("smartcard")}><i className="fas fa-id-badge"></i> Smart Card</button>
         <button className={`btn type-btn ${activeTab === "location" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("location")}><i className="fas fa-map-marker-alt"></i> Location</button>
                 <button className={`btn type-btn ${activeTab === "event" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("event")}><i className="fas fa-calendar-alt"></i> Event</button>
             </div>
@@ -343,8 +366,8 @@ END:VCARD`;
                         </div>
                     </div>
 
-                    {/*  vCard Content Form  */}
-                    <div id="content-vcard" className={`type-content ${activeTab === "vcard" ? "" : "d-none"}`} >
+                    {/*  vCard / SmartCard Content Form  */}
+                    <div id="content-vcard" className={`type-content ${activeTab === "vcard" || activeTab === "smartcard" ? "" : "d-none"}`} >
                         <div className="row">
                             <div className="col-md-6 form-group mb-2">
                                 <label htmlFor="vcard_first_name" className="text-muted mb-1">First Name</label>
@@ -370,6 +393,15 @@ END:VCARD`;
                                 <label htmlFor="vcard_desc" className="text-muted mb-1">Description</label>
                                 <textarea id="vcard_desc" name="vcard_desc" className="form-control" rows="3" value={vcardDesc} onChange={(e) => setVcardDesc(e.target.value)}></textarea>
                             </div>
+                            
+                            {activeTab === 'smartcard' && (
+                                <div className="col-md-12 form-group mt-3 mb-2">
+                                    <label htmlFor="sc_photo_url" className="text-muted mb-1">Profile Photo URL (Required for Smart Card)</label>
+                                    <input type="url" id="sc_photo_url" className="form-control" placeholder="https://" value={scPhotoUrl} onChange={(e) => setScPhotoUrl(e.target.value)} />
+                                    <small className="text-muted mt-1 d-block">Paste a link to your profile picture (Imgur, Drive, etc.).</small>
+                                </div>
+                            )}
+
                             <div className="col-md-12 mt-4 mb-2">
                                 <h6>Social Media & Links</h6>
                                 <hr className="mt-1 mb-3" />
