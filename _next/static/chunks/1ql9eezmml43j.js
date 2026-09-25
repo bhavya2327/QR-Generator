@@ -15,7 +15,7 @@ ${tw?`URL:${tw}
 `:""}${tO?`X-SOCIALPROFILE;type=facebook:${tO}
 `:""}${tj?`X-SOCIALPROFILE;type=youtube:${tj}
 `:""}ADR;TYPE=work:;;${tf};${td};${ty};${tg};${tv}
-END:VCARD`;if("smartcard"===t){let t=btoa(encodeURIComponent(JSON.stringify({firstName:V,lastName:Y,phone:Q,email:tn,company:to,job:tl,desc:ts,website:tw,linkedin:tS,facebook:tO,instagram:tE,youtube:tj,whatsapp:tN,photo:tB?tQ(tB,!1):"",bg:tP?tQ(tP,!1):"#667eea"})));return`https://bhavya2327.github.io/QR-Generator/card?data=${t}`}if("location"===t){let t=encodeURIComponent(`${tM} ${tz} ${tF} ${tq}`.trim());return t?`https://www.google.com/maps/search/?api=1&query=${t}`:"https://www.google.com/maps"}if("event"===t){let t=t=>t?t.replace(/[-:]/g,"")+"Z":"";return`BEGIN:VEVENT
+END:VCARD`;if("smartcard"===t){let t=btoa(encodeURIComponent(JSON.stringify({firstName:V,lastName:Y,phone:Q,email:tn,company:to,job:tl,desc:ts,website:tw,linkedin:tS,facebook:tO,instagram:tE,youtube:tj,whatsapp:tN,photo:tB?tQ(tB,!1):"",bg:tP?tQ(tP,!1):"#667eea"})));return`https://bhavya2327.github.io/QR-Generator/card/?data=${t}`}if("location"===t){let t=encodeURIComponent(`${tM} ${tz} ${tF} ${tq}`.trim());return t?`https://www.google.com/maps/search/?api=1&query=${t}`:"https://www.google.com/maps"}if("event"===t){let t=t=>t?t.replace(/[-:]/g,"")+"Z":"";return`BEGIN:VEVENT
 SUMMARY:${tH}
 LOCATION:${tV}
 DTSTART:${t(tY)}
@@ -30,7 +30,7 @@ ORG:${t.company||""}
 NOTE:${t.description||""}
 TEL:${t.phone||""}
 EMAIL:${t.email||""}
-${r}${e("linkedin",t.linkedin)}${e("instagram",t.instagram)}${e("facebook",t.facebook)}${e("youtube",t.youtube)}END:VCARD`}if("smartcard"===e){let e=btoa(encodeURIComponent(JSON.stringify({firstName:t.first_name,lastName:t.last_name,phone:t.phone,email:t.email,company:t.company,desc:t.description,website:t.website,linkedin:t.linkedin,facebook:t.facebook,instagram:t.instagram,youtube:t.youtube,whatsapp:t.whatsapp,photo:t.photo_url?tQ(t.photo_url,!1):"",bg:t.bg_image_url?tQ(t.bg_image_url,!1):t.bg_color||"#667eea",job:t.job_title||""})));return`https://bhavya2327.github.io/QR-Generator/card?data=${e}`}if("location"===e){let e=encodeURIComponent(`${t.street||""} ${t.city||""} ${t.state||""} ${t.zip||""}`.trim());return`https://www.google.com/maps/search/?api=1&query=${e}`}if("event"===e){let e=t=>t?t.replace(/[-:T]/g,"")+"Z":"";return`BEGIN:VEVENT
+${r}${e("linkedin",t.linkedin)}${e("instagram",t.instagram)}${e("facebook",t.facebook)}${e("youtube",t.youtube)}END:VCARD`}if("smartcard"===e){let e=btoa(encodeURIComponent(JSON.stringify({firstName:t.first_name,lastName:t.last_name,phone:t.phone,email:t.email,company:t.company,desc:t.description,website:t.website,linkedin:t.linkedin,facebook:t.facebook,instagram:t.instagram,youtube:t.youtube,whatsapp:t.whatsapp,photo:t.photo_url?tQ(t.photo_url,!1):"",bg:t.bg_image_url?tQ(t.bg_image_url,!1):t.bg_color||"#667eea",job:t.job_title||""})));return`https://bhavya2327.github.io/QR-Generator/card/?data=${e}`}if("location"===e){let e=encodeURIComponent(`${t.street||""} ${t.city||""} ${t.state||""} ${t.zip||""}`.trim());return`https://www.google.com/maps/search/?api=1&query=${e}`}if("event"===e){let e=t=>t?t.replace(/[-:T]/g,"")+"Z":"";return`BEGIN:VEVENT
 SUMMARY:${t.name||""}
 LOCATION:${t.location||""}
 DTSTART:${e(t.start)}
