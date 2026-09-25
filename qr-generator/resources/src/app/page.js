@@ -284,7 +284,15 @@ END:VCARD`;
             }
 
             const content = await zip.generateAsync({ type: "blob" });
-            saveAs(content, `bulk-qrs-${bulkFormat}.zip`);
+            
+            const url = window.URL.createObjectURL(content);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `bulk-qrs-${bulkFormat}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
             
             setBulkStage('done');
         } catch(e) {
