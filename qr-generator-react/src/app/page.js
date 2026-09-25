@@ -71,15 +71,19 @@ export default function Page() {
     const [eventStart, setEventStart] = useState('');
     const [eventEnd, setEventEnd] = useState('');
 
-    // Convert Google Drive / Dropbox sharing links to direct download URLs
+    // Convert Google Drive / Dropbox sharing links to direct download URLs and wrap in CORS proxy
     const toDirectPhotoUrl = (url) => {
         if (!url) return '';
+        if (url.startsWith('data:')) return url;
+        
+        let directUrl = url;
         const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
-        if (driveMatch) return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+        if (driveMatch) directUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
         const driveMatch2 = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
-        if (driveMatch2) return `https://lh3.googleusercontent.com/d/${driveMatch2[1]}`;
-        if (url.includes('dropbox.com')) return url.replace('dl=0', 'dl=1');
-        return url;
+        if (driveMatch2) directUrl = `https://lh3.googleusercontent.com/d/${driveMatch2[1]}`;
+        if (url.includes('dropbox.com')) directUrl = url.replace('dl=0', 'dl=1');
+        
+        return `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
     };
 
     const handleCenterLogoUpload = (e) => {
@@ -484,7 +488,7 @@ END:VCARD`;
                             <input type="file" id="csv-file" accept=".csv" style={{ display: "none" }} onChange={onFileUpload} />
                         </div>
                         <div className="text-center mt-3">
-                            <a href={`/QR-Generator/sample_${activeTab}.csv`} download={`sample_${activeTab}.csv`} className="text-muted">Download Sample CSV Format</a>
+                            <a href={`./sample_${activeTab}.csv`} download={`sample_${activeTab}.csv`} className="text-muted">Download Sample CSV Format</a>
                         </div>
                         <div id="bulk-error-message" className="text-danger mt-2 text-center"></div>
                     </div>
