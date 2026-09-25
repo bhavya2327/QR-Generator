@@ -258,7 +258,25 @@ END:VCARD`;
                     imageOptions: { crossOrigin: "anonymous", margin: 5, imageSize: 0.4 }
                 });
 
-                const blob = await qrCode.getRawData(bulkFormat);
+                let blob = null;
+                try {
+                    blob = await Promise.race([
+                        qrCode.getRawData(bulkFormat),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout extracting QR code')), 8000))
+                    ]);
+                } catch (err) {
+                    console.warn(`Skipping logo for row ${i + 1} due to image load failure or timeout. Generating without logo...`);
+                    const fallbackQrCode = new QRCodeStyling({
+                        width: 300, height: 300, type: "svg", data: qrData,
+                        qrOptions: { errorCorrectionLevel: 'H' },
+                        dotsOptions: { color: fgColor, type: bodyShape },
+                        cornersSquareOptions: { color: fgColor, type: eyeFrameShape },
+                        cornersDotOptions: { color: fgColor, type: eyeBallShape },
+                        backgroundOptions: { color: bgColor }
+                    });
+                    blob = await fallbackQrCode.getRawData(bulkFormat).catch(() => null);
+                }
+
                 if (blob) zip.file(`qr-${i + 1}.${bulkFormat}`, blob);
                 
                 setBulkProgress(Math.round(((i + 1) / total) * 100));
