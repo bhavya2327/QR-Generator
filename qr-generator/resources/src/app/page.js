@@ -57,7 +57,9 @@ export default function Page() {
     const [vcardInstagram, setVcardInstagram] = useState('');
     const [vcardFacebook, setVcardFacebook] = useState('');
     const [vcardYoutube, setVcardYoutube] = useState('');
-    const [scPhotoUrl, setScPhotoUrl] = useState('');
+    const [scPhotoUrl, setScPhotoUrl] = useState('https://drive.google.com/file/d/1XhAzsCNTPQUp2m3uuPTvzdzuTeTXPLi9/view?usp=sharing');
+    const [scBgImgUrl, setScBgImgUrl] = useState('https://drive.google.com/file/d/1R1jHOI4n2gvLt_HnepCJqfKHK4TdFPC-/view?usp=sharing');
+    const [vcardWhatsapp, setVcardWhatsapp] = useState('');
     
     // Location
     const [locStreet, setLocStreet] = useState('');
@@ -72,7 +74,7 @@ export default function Page() {
     const [eventEnd, setEventEnd] = useState('');
 
     // Convert Google Drive / Dropbox sharing links to direct download URLs and wrap in CORS proxy
-    const toDirectPhotoUrl = (url) => {
+    const toDirectPhotoUrl = (url, useProxy = true) => {
         if (!url) return '';
         if (url.startsWith('data:')) return url;
         
@@ -83,7 +85,7 @@ export default function Page() {
         if (driveMatch2) directUrl = `https://lh3.googleusercontent.com/d/${driveMatch2[1]}`;
         if (url.includes('dropbox.com')) directUrl = url.replace('dl=0', 'dl=1');
         
-        return `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+        return useProxy ? `https://corsproxy.io/?${encodeURIComponent(directUrl)}` : directUrl;
     };
 
     const handleCenterLogoUpload = (e) => {
@@ -127,10 +129,13 @@ END:VCARD`;
                 firstName: vcardFirst, lastName: vcardLast, phone: vcardPhone, email: vcardEmail,
                 company: vcardCompany, job: vcardJob, desc: vcardDesc,
                 website: vcardWebsite, linkedin: vcardLinkedIn, facebook: vcardFacebook,
-                instagram: vcardInstagram, youtube: vcardYoutube, photo: scPhotoUrl
+                instagram: vcardInstagram, youtube: vcardYoutube, whatsapp: vcardWhatsapp,
+                photo: scPhotoUrl ? toDirectPhotoUrl(scPhotoUrl, false) : '',
+                bg: scBgImgUrl ? toDirectPhotoUrl(scBgImgUrl, false) : ''
             };
             const payload = btoa(encodeURIComponent(JSON.stringify(data)));
-            return `${window.location.origin}/QR-Generator/card?data=${payload}`;
+            const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://bhavya2327.github.io';
+            return `${baseUrl}/QR-Generator/card?data=${payload}`;
         }
         if (activeTab === 'location') {
             const query = encodeURIComponent(`${locStreet} ${locCity} ${locState} ${locZip}`.trim());
@@ -164,7 +169,7 @@ END:VCARD`;
         phone: { columns: ['phone', 'logo_url'], label: 'Phone', validate: (row) => row.phone && row.phone.trim().length > 0 },
         sms: { columns: ['phone', 'message', 'logo_url'], label: 'SMS', validate: (row) => row.phone && row.phone.trim().length > 0 },
         vcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'logo_url'], label: 'vCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
-        smartcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'photo_url', 'logo_url'], label: 'SmartCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
+        smartcard: { columns: ['first_name', 'last_name', 'phone', 'email', 'company', 'description', 'website', 'linkedin', 'facebook', 'instagram', 'youtube', 'whatsapp', 'photo_url', 'bg_image_url', 'logo_url'], label: 'SmartCard', validate: (row) => row.first_name && row.first_name.trim().length > 0 },
         location: { columns: ['street', 'city', 'state', 'zip', 'logo_url'], label: 'Location', validate: (row) => (row.street || row.city) && (row.street + row.city).trim().length > 0 },
         event: { columns: ['name', 'location', 'start', 'end', 'logo_url'], label: 'Event', validate: (row) => row.name && row.name.trim().length > 0 },
     };
@@ -186,10 +191,12 @@ END:VCARD`;
                 firstName: row.first_name, lastName: row.last_name, phone: row.phone, email: row.email,
                 company: row.company, desc: row.description, website: row.website,
                 linkedin: row.linkedin, facebook: row.facebook, instagram: row.instagram, 
-                youtube: row.youtube, photo: row.photo_url ? toDirectPhotoUrl(row.photo_url) : ''
+                youtube: row.youtube, whatsapp: row.whatsapp, photo: row.photo_url ? toDirectPhotoUrl(row.photo_url, false) : '',
+                bg: row.bg_image_url ? toDirectPhotoUrl(row.bg_image_url, false) : ''
             };
             const payload = btoa(encodeURIComponent(JSON.stringify(data)));
-            return `${window.location.origin}/QR-Generator/card?data=${payload}`;
+            const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://bhavya2327.github.io';
+            return `${baseUrl}/QR-Generator/card?data=${payload}`;
         }
         if (tab === 'location') {
             const query = encodeURIComponent(`${row.street || ''} ${row.city || ''} ${row.state || ''} ${row.zip || ''}`.trim());
@@ -245,12 +252,12 @@ END:VCARD`;
             for (let i = 0; i < total; i++) {
                 const rowData = validRecords[i].data;
                 const qrData = rowToQrData(rowData, activeTab);
-                const rowLogoUrl = rowData.logo_url ? toDirectPhotoUrl(rowData.logo_url) : centerLogo;
+                const rowLogoUrl = rowData.logo_url ? toDirectPhotoUrl(rowData.logo_url, true) : centerLogo;
 
                 const qrCode = new QRCodeStyling({
                     width: 300, height: 300, type: "svg", data: qrData,
                     image: rowLogoUrl,
-                    qrOptions: { errorCorrectionLevel: 'H' },
+                    qrOptions: { errorCorrectionLevel: rowLogoUrl ? 'H' : 'L' },
                     dotsOptions: { color: fgColor, type: bodyShape },
                     cornersSquareOptions: { color: fgColor, type: eyeFrameShape },
                     cornersDotOptions: { color: fgColor, type: eyeBallShape },
@@ -268,7 +275,7 @@ END:VCARD`;
                     console.warn(`Skipping logo for row ${i + 1} due to image load failure or timeout. Generating without logo...`);
                     const fallbackQrCode = new QRCodeStyling({
                         width: 300, height: 300, type: "svg", data: qrData,
-                        qrOptions: { errorCorrectionLevel: 'H' },
+                        qrOptions: { errorCorrectionLevel: rowLogoUrl ? 'H' : 'L' },
                         dotsOptions: { color: fgColor, type: bodyShape },
                         cornersSquareOptions: { color: fgColor, type: eyeFrameShape },
                         cornersDotOptions: { color: fgColor, type: eyeBallShape },
@@ -281,18 +288,21 @@ END:VCARD`;
                 
                 setBulkProgress(Math.round(((i + 1) / total) * 100));
                 setBulkText(`${Math.round(((i + 1) / total) * 100)}% (${i + 1} / ${total})`);
+                
+                // Allow React to flush the DOM update so the progress bar visually updates
+                await new Promise(r => setTimeout(r, 10));
             }
 
-            const content = await zip.generateAsync({ type: "blob" });
+            setBulkText("Zipping files... Please wait.");
+            const contentBase64 = await zip.generateAsync({ type: "base64" });
+            const url = "data:application/zip;base64," + contentBase64;
             
-            const url = window.URL.createObjectURL(content);
             const link = document.createElement('a');
             link.href = url;
             link.download = `bulk-qrs-${bulkFormat}.zip`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
             
             setBulkStage('done');
         } catch(e) {
@@ -303,27 +313,27 @@ END:VCARD`;
     };
 
     return (
-        <div className="container mt-4 mb-5">
+        <div className="container mt-5 mb-5 p-4 p-md-5 bg-white shadow-sm" style={{ borderRadius: '24px', maxWidth: '1100px' }}>
             
 
 
 <div className="container mt-4 mb-5">
     {/*  Top Tabs for Data Types  */}
-    <div className="d-flex overflow-auto pb-2 mb-4" id="type-tabs" >
-        <button className={`btn type-btn ${activeTab === "url" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("url")}><i className="fas fa-link"></i> URL</button>
-        <button className={`btn type-btn ${activeTab === "text" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("text")}><i className="fas fa-font"></i> Text</button>
-        <button className={`btn type-btn ${activeTab === "email" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("email")}><i className="fas fa-envelope"></i> Email</button>
-        <button className={`btn type-btn ${activeTab === "phone" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("phone")}><i className="fas fa-phone"></i> Phone</button>
-        <button className={`btn type-btn ${activeTab === "sms" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("sms")}><i className="fas fa-comment"></i> SMS</button>
-        <button className={`btn type-btn ${activeTab === "vcard" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("vcard")}><i className="fas fa-id-card"></i> vCard</button>
-        <button className={`btn type-btn ${activeTab === "smartcard" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("smartcard")}><i className="fas fa-id-badge"></i> Smart Card</button>
-        <button className={`btn type-btn ${activeTab === "location" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("location")}><i className="fas fa-map-marker-alt"></i> Location</button>
-                <button className={`btn type-btn ${activeTab === "event" ? "btn-primary active" : "btn-outline"}`} onClick={() => setActiveTab("event")}><i className="fas fa-calendar-alt"></i> Event</button>
-            </div>
+    <div className="d-flex gap-2 overflow-auto pb-3 mb-4" id="type-tabs" >
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "url" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "url" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("url")}><i className="fas fa-link" style={{ color: activeTab === "url" ? "white" : "inherit" }}></i> URL</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "text" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "text" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("text")}><i className="fas fa-font" style={{ color: activeTab === "text" ? "white" : "inherit" }}></i> Text</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "email" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "email" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("email")}><i className="fas fa-envelope" style={{ color: activeTab === "email" ? "white" : "inherit" }}></i> Email</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "phone" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "phone" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("phone")}><i className="fas fa-phone" style={{ color: activeTab === "phone" ? "white" : "inherit" }}></i> Phone</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "sms" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "sms" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("sms")}><i className="fas fa-comment" style={{ color: activeTab === "sms" ? "white" : "inherit" }}></i> SMS</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "vcard" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "vcard" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("vcard")}><i className="fas fa-id-card" style={{ color: activeTab === "vcard" ? "white" : "inherit" }}></i> vCard</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "smartcard" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "smartcard" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("smartcard")}><i className="fas fa-id-badge" style={{ color: activeTab === "smartcard" ? "white" : "inherit" }}></i> Smart Card</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "location" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "location" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("location")}><i className="fas fa-map-marker-alt" style={{ color: activeTab === "location" ? "white" : "inherit" }}></i> Location</button>
+        <button className={`btn d-flex align-items-center gap-2 fw-medium px-3 py-2 border-0 ${activeTab === "event" ? "text-white" : "text-muted bg-transparent"}`} style={{ backgroundColor: activeTab === "event" ? "var(--primary-color)" : "transparent", borderRadius: "12px" }} onClick={() => setActiveTab("event")}><i className="fas fa-calendar-alt" style={{ color: activeTab === "event" ? "white" : "inherit" }}></i> Event</button>
+    </div>
 
     <div className="row">
         {/*  Left Column: Settings  */}
-        <div className={`col-md-${isBulk ? 12 : 8}`}>
+        <div className={`col-md-${isBulk ? 12 : 7}`}>
             
             {/*  1. Enter Content  */}
             <div className="card mb-3 p-0 overflow-hidden">
@@ -425,11 +435,18 @@ END:VCARD`;
                             </div>
                             
                             {activeTab === 'smartcard' && (
-                                <div className="col-md-12 form-group mt-3 mb-2">
-                                    <label htmlFor="sc_photo_url" className="text-muted mb-1">Profile Photo URL (Required for Smart Card)</label>
-                                    <input type="url" id="sc_photo_url" className="form-control" placeholder="https://" value={scPhotoUrl} onChange={(e) => setScPhotoUrl(e.target.value)} />
-                                    <small className="text-muted mt-1 d-block">Paste a link to your profile picture (Imgur, Drive, etc.).</small>
-                                </div>
+                                <>
+                                    <div className="col-md-12 form-group mt-3 mb-2">
+                                        <label htmlFor="sc_photo_url" className="text-muted mb-1">Profile Photo URL (Required for Smart Card)</label>
+                                        <input type="url" id="sc_photo_url" className="form-control" placeholder="https://" value={scPhotoUrl} onChange={(e) => setScPhotoUrl(e.target.value)} />
+                                        <small className="text-muted mt-1 d-block">Paste a link to your profile picture (Imgur, Drive, etc.).</small>
+                                    </div>
+                                    <div className="col-md-12 form-group mt-2 mb-2">
+                                        <label htmlFor="sc_bg_url" className="text-muted mb-1">Background Image URL</label>
+                                        <input type="url" id="sc_bg_url" className="form-control" placeholder="https://" value={scBgImgUrl} onChange={(e) => setScBgImgUrl(e.target.value)} />
+                                        <small className="text-muted mt-1 d-block">Paste a link to a background image for the banner.</small>
+                                    </div>
+                                </>
                             )}
 
                             <div className="col-md-12 mt-4 mb-2">
@@ -456,6 +473,12 @@ END:VCARD`;
                                 <label htmlFor="vcard_youtube" className="text-muted mb-1">YouTube URL</label>
                                 <input type="url" id="vcard_youtube" className="form-control" placeholder="https://" value={vcardYoutube} onChange={(e) => setVcardYoutube(e.target.value)} />
                             </div>
+                            {activeTab === 'smartcard' && (
+                                <div className="col-md-6 form-group mb-2">
+                                    <label htmlFor="vcard_whatsapp" className="text-muted mb-1">WhatsApp Number (e.g. 1234567890)</label>
+                                    <input type="text" id="vcard_whatsapp" className="form-control" placeholder="1234567890" value={vcardWhatsapp} onChange={(e) => setVcardWhatsapp(e.target.value)} />
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -615,10 +638,18 @@ END:VCARD`;
                 
                 <div id="download-actions"  className="mt-3">
                     <div className="d-flex gap-2">
-                        <button className="btn btn-primary flex-grow-1" onClick={() => handleSingleDownload("png", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download PNG</button>
-                        <button className="btn btn-secondary flex-grow-1" onClick={() => handleSingleDownload("svg", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download SVG</button>
+                        <button className="btn flex-grow-1" style={{ backgroundColor: '#f4f4f5', color: '#333', border: 'none', borderRadius: '12px', padding: '10px' }} id="download-png" onClick={() => handleSingleDownload("png", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download PNG</button>
+                        <button className="btn flex-grow-1" style={{ backgroundColor: '#f4f4f5', color: '#333', border: 'none', borderRadius: '12px', padding: '10px' }} id="download-svg" onClick={() => handleSingleDownload("svg", getQrData(), fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo)}>Download SVG</button>
                     </div>
                 </div>
+                {activeTab === 'smartcard' && (
+                    <div className="mt-2 text-center">
+                        <small className="text-muted" style={{ wordBreak: 'break-all', fontSize: '10px' }}>
+                            Debug URL: <a href={getQrData()} target="_blank" rel="noreferrer">Click to test link directly</a>
+                        </small>
+                    </div>
+                )}
+
 
                 {/*  Bulk Progress / Actions  */}
                 <div id="bulk-progress-container" className={isBulk && bulkStage !== 'idle' ? "mt-4" : "d-none"}>

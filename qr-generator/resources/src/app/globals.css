@@ -11,6 +11,10 @@
 
 
 
+body {
+    background-color: #f0f2f5 !important;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -395,5 +399,20 @@ h5 {
 .btn-primary.active, .btn-primary:active {
     background-color: #8b5cf6 !important;
     border-color: #7c3aed !important;
+    color: white !important;
+}
+.form-control { border: 1px solid #e2e8f0 !important; border-radius: 10px !important; padding: 12px 16px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; }
+
+/* Tab and Download Button Hover Effects */
+#type-tabs button:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+#type-tabs button:hover i {
+    color: white !important;
+}
+
+#download-png:hover, #download-svg:hover {
+    background-color: var(--primary-color) !important;
     color: white !important;
 }

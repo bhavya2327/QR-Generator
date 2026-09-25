@@ -45,7 +45,27 @@ TEL;TYPE=work,voice:${profile.phone || ''}
 EMAIL:${profile.email || ''}
 ${website}${getSocial('linkedin', profile.linkedin)}${getSocial('instagram', profile.instagram)}${getSocial('facebook', profile.facebook)}${getSocial('youtube', profile.youtube)}END:VCARD`;
         
-        const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+        const blob = new Blob([vcard], { type: 'text/vcard' });
+        const file = new File([blob], `${profile.firstName || 'contact'}.vcf`, { type: 'text/vcard' });
+
+        // iPhone/iPad: hand the vCard to the native share sheet (requires HTTPS).
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
+                files: [file],
+                title: profile.firstName + " " + profile.lastName,
+                text: "Save " + profile.firstName + " " + profile.lastName + " to your contacts"
+            }).catch(() => { });
+            return;
+        }
+
+        // Fallback 1: iOS HTTP fallback (data URI opens directly in Contacts app)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (isIOS) {
+            window.location.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
+            return;
+        }
+
+        // Fallback 2: Standard Blob download (Desktop, Android HTTP)
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -53,6 +73,7 @@ ${website}${getSocial('linkedin', profile.linkedin)}${getSocial('instagram', pro
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
     };
 
     return (
@@ -60,7 +81,9 @@ ${website}${getSocial('linkedin', profile.linkedin)}${getSocial('instagram', pro
             {/* Banner */}
             <div style={{ 
                 height: '200px', 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: profile.bg && profile.bg.startsWith('http') 
+                    ? `url('${profile.bg}') center/cover no-repeat` 
+                    : (profile.bg && profile.bg.startsWith('#') ? profile.bg : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'),
                 position: 'relative'
             }}></div>
             
@@ -158,6 +181,13 @@ ${website}${getSocial('linkedin', profile.linkedin)}${getSocial('instagram', pro
                                         <a href={profile.youtube} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
                                             <div className="rounded-circle d-flex justify-content-center align-items-center shadow-sm text-white" style={{ width: '50px', height: '50px', backgroundColor: '#ff0000' }}>
                                                 <i className="fab fa-youtube fs-5"></i>
+                                            </div>
+                                        </a>
+                                    )}
+                                    {profile.whatsapp && (
+                                        <a href={`https://wa.me/${profile.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                                            <div className="rounded-circle d-flex justify-content-center align-items-center shadow-sm text-white" style={{ width: '50px', height: '50px', backgroundColor: '#25D366' }}>
+                                                <i className="fab fa-whatsapp fs-5"></i>
                                             </div>
                                         </a>
                                     )}

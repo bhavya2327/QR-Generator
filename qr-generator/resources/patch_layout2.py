@@ -1,33 +1,42 @@
 import re
 
 with open('src/app/page.js', 'r') as f:
-    text = f.read()
+    content = f.read()
 
-# 1. Update columns for isBulk
-text = text.replace('<div className="col-md-8">', '<div className={`col-md-${isBulk ? 12 : 8}`}>')
-text = text.replace('<div className="col-md-4">', '<div className={`col-md-4 ${isBulk ? "d-none" : ""}`}>')
+# Replace column size
+content = content.replace('col-md-${isBulk ? 12 : 8}', 'col-md-${isBulk ? 12 : 7}')
 
-# 2. Extract bulk-mode-container
-bulk_container_match = re.search(r'(<div id="bulk-mode-container".*?<div id="bulk-error-message".*?</div>\s*</div>)', text, re.DOTALL)
-if not bulk_container_match:
-    print("Could not find bulk container!")
-    exit(1)
+# Replace Enter Content header logic
+enter_content_old = r'''<div className="card mb-3 p-0 overflow-hidden">
+                <div className="card-header bg-transparent-glass-header d-flex justify-content-between align-items-center p-3 cursor-pointer" style={{ borderBottom: '1px solid var\(--border-color\)', cursor: 'pointer' }} onClick={() => setIsContentOpen\(!isContentOpen\)}>
+                    <h5 className="mb-0">1. Enter Content</h5>
+                    <div className="d-flex align-items-center gap-3">
+                        <div className="form-check form-switch m-0 d-flex align-items-center" onClick={\(e\) => e.stopPropagation\(\)}>
+                            <label className="form-check-label me-2 text-muted" htmlFor="bulk-toggle-switch" style={{ fontSize: '0.875rem' }}>Bulk Mode</label>
+                            <input className="form-check-input mt-0" type="checkbox" id="bulk-toggle-switch" style={{ cursor: 'pointer', width: '2.5em', height: '1.25em', marginLeft: '0.5rem' }} checked={isBulk} onChange={\(e\) => setIsBulk\(e.target.checked\)} />
+                        </div>
+                        <i className={`fas \${isContentOpen \? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>
+                    </div>
+                </div>
+                <div className={`p-4 bg-transparent-glass \${isContentOpen \? '' : 'd-none'}`} id="content-section">'''
 
-bulk_container_code = bulk_container_match.group(1)
+enter_content_new = r'''<div className="d-flex justify-content-between align-items-center mb-3 px-2">
+                <h5 className="fw-bold mb-0">Enter Content</h5>
+                <div className="d-flex align-items-center">
+                    <label className="form-check-label me-2 text-muted" htmlFor="bulk-toggle-switch" style={{ fontSize: '0.875rem' }}>Bulk Mode</label>
+                    <div className="form-check form-switch m-0 d-flex align-items-center">
+                        <input className="form-check-input mt-0" type="checkbox" id="bulk-toggle-switch" style={{ cursor: 'pointer', width: '2.5em', height: '1.25em' }} checked={isBulk} onChange={(e) => setIsBulk(e.target.checked)} />
+                    </div>
+                </div>
+            </div>
+            
+            <div className="p-4 mb-4" style={{ backgroundColor: '#f4f4f5', borderRadius: '24px' }}>
+                <div className={isBulk ? "d-none" : ""}>'''
 
-# Remove it from its current location
-text = text.replace(bulk_container_code, '')
+content = re.sub(enter_content_old, enter_content_new, content)
 
-# 3. We also have a `<div id="single-mode-container"` that we should probably just remove or rename, because we want to wrap ALL content-* in it.
-# Actually, `content-url` has:
-# <div id="content-url" ...>
-#     <div id="single-mode-container" className={isBulk ? "d-none" : ""}>
-#         <form id="single-qr-form"> ... </form>
-#     </div>
-# </div>
-# Let's remove `<div id="single-mode-container" className={isBulk ? "d-none" : ""}>` and its closing `</div>` from `content-url`.
-text = text.replace('<div id="single-mode-container" className={isBulk ? "d-none" : ""}>', '')
-# The closing div is right before where bulk-mode-container was.
-text = re.sub(r'</form>\s*</div>\s*</div>', '</form>\n                    </div>', text) # careful here
-
-# Let's just do it manually with simple string splits to be extremely safe.
+# Now remove the closing `</div> </div>` of the old card.
+# The card closed after `{/* SMS Content Form */}`... no wait, after all the type contents. Let's find where `<div className={isBulk ? "d-none" : ""}>` closes.
+# Actually, the easiest way is to use multi_replace_file_content or a robust regex.
+with open('src/app/page.js', 'w') as f:
+    f.write(content)

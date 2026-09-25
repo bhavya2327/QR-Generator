@@ -1,77 +1,111 @@
 import re
 
 with open('src/app/page.js', 'r') as f:
-    text = f.read()
+    content = f.read()
 
-# 1. Add states
-state_addition = """
-    const [isContentOpen, setIsContentOpen] = useState(true);
-    const [isColorOpen, setIsColorOpen] = useState(false);
-    const [isLogoOpen, setIsLogoOpen] = useState(false);
-    const [isDesignOpen, setIsDesignOpen] = useState(false);
-"""
-text = text.replace(
-    "const [bodyShape, setBodyShape] = useState('square');",
-    "const [bodyShape, setBodyShape] = useState('square');" + state_addition
-)
+# 1. Colors
+old_colors = r'''<div className={`card mb-3 p-0 overflow-hidden \${isBulk \? 'd-none' : ''}`}>
+                <div className="card-header bg-transparent-glass-header d-flex justify-content-between align-items-center p-3 cursor-pointer" style={{ borderBottom: '1px solid var\(--border-color\)', cursor: 'pointer' }} onClick={() => setIsColorOpen\(!isColorOpen\)}>
+                    <h5 className="mb-0">2. Set Colors</h5>
+                    <i className={`fas \${isColorOpen \? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>
+                </div>
+                <div className={`p-4 bg-transparent-glass \${isColorOpen \? '' : 'd-none'}`} id="color-section">'''
+new_colors = r'''<div className={`bg-white rounded-3 mb-3 overflow-hidden \${isBulk ? 'd-none' : ''}`} style={{ borderRadius: '12px' }}>
+                <div className="d-flex justify-content-between align-items-center p-3 cursor-pointer" onClick={() => setIsColorOpen(!isColorOpen)}>
+                    <h6 className="mb-0 fw-bold text-dark">Select Colors</h6>
+                </div>
+                <div className={`p-4 \${isColorOpen ? '' : 'd-none'}`} id="color-section">'''
+content = re.sub(old_colors, new_colors, content)
+
+# 2. Logo
+old_logo = r'''<div className={`card mb-3 p-0 overflow-hidden \${isBulk \? 'd-none' : ''}`}>
+                <div className="card-header bg-transparent-glass-header d-flex justify-content-between align-items-center p-3 cursor-pointer" style={{ borderBottom: '1px solid var\(--border-color\)', cursor: 'pointer' }} onClick={() => setIsLogoOpen\(!isLogoOpen\)}>
+                    <h5 className="mb-0">3. Add Logo Image</h5>
+                    <i className={`fas \${isLogoOpen \? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>
+                </div>
+                <div className={`p-4 bg-transparent-glass \${isLogoOpen \? '' : 'd-none'} border-start border-end border-bottom mb-2`} id="logo-section">'''
+new_logo = r'''<div className={`bg-white rounded-3 mb-3 overflow-hidden \${isBulk ? 'd-none' : ''}`} style={{ borderRadius: '12px' }}>
+                <div className="d-flex justify-content-between align-items-center p-3 cursor-pointer" onClick={() => setIsLogoOpen(!isLogoOpen)}>
+                    <h6 className="mb-0 fw-bold text-dark">Add Logo Image</h6>
+                </div>
+                <div className={`p-4 \${isLogoOpen ? '' : 'd-none'}`} id="logo-section">'''
+content = re.sub(old_logo, new_logo, content)
+
+# 3. Design
+old_design = r'''<div className={`card mb-3 p-0 overflow-hidden \${isBulk \? 'd-none' : ''}`}>
+                <div className="card-header bg-transparent-glass-header d-flex justify-content-between align-items-center p-3 cursor-pointer" style={{ borderBottom: '1px solid var\(--border-color\)', cursor: 'pointer' }} onClick={() => setIsDesignOpen\(!isDesignOpen\)}>
+                    <h5 className="mb-0">4. Customize Design</h5>
+                    <i className={`fas \${isDesignOpen \? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>
+                </div>
+                <div className={`p-4 bg-transparent-glass \${isDesignOpen \? '' : 'd-none'} border-start border-end border-bottom mb-2`} id="design-section">'''
+new_design = r'''<div className={`bg-white rounded-3 mb-3 overflow-hidden \${isBulk ? 'd-none' : ''}`} style={{ borderRadius: '12px' }}>
+                <div className="d-flex justify-content-between align-items-center p-3 cursor-pointer" onClick={() => setIsDesignOpen(!isDesignOpen)}>
+                    <h6 className="mb-0 fw-bold text-dark">Customize Design</h6>
+                </div>
+                <div className={`p-4 \${isDesignOpen ? '' : 'd-none'}`} id="design-section">'''
+content = re.sub(old_design, new_design, content)
+
+# Remove the extra </div> from the end of the gray container if any, wait actually, we wrapped it manually in python script 2, 
+# wait, in python script 2, we just opened `<div className="p-4 mb-4" style={{ backgroundColor: '#f4f4f5', borderRadius: '24px' }}>`. We need to close it before the right column!
+
+# Let's find where the right column starts:
+# `<div className={`col-md-4 ${isBulk ? 'd-none' : ''}`}>`
+# We'll replace it to close the gray panel and start the new right column.
+old_right_col = r'''</div>
+        {/*  Right Column: QR Code Preview  */}
+        <div className={`col-md-4 \${isBulk \? 'd-none' : ''}`}>'''
+new_right_col = r'''</div>
+            </div>
+        {/*  Right Column: QR Code Preview  */}
+        <div className={`col-md-5 \${isBulk ? 'd-none' : ''}`}>
+            <div className="p-4 d-flex flex-column align-items-center" style={{ backgroundColor: '#f4f4f5', borderRadius: '24px' }}>
+                <div className="bg-white p-3 shadow-sm mb-4" style={{ borderRadius: '16px', display: 'inline-block' }}>'''
+content = re.sub(old_right_col, new_right_col, content)
+
+# Now fix the right column structure.
+# Inside right column we have `<div className="card text-center sticky-top" style={{ top: '20px' }}>`
+old_qr_card = r'''<div className="card text-center sticky-top" style={{ top: '20px' }}>
+                <div className="card-header bg-primary text-white py-3">
+                    <h5 className="mb-0"><i className="fas fa-qrcode me-2"></i>Live Preview</h5>
+                </div>
+                <div className="card-body p-4 d-flex flex-column align-items-center">
+                    
+                    {/*  The actual QR Code SVG container  */}
+                    <div id="qr-code-container" className="mb-4 bg-white p-3 border rounded shadow-sm d-inline-block">'''
+new_qr_card = r'''<div className="text-center sticky-top w-100" style={{ top: '20px' }}>
+                <div className="d-flex flex-column align-items-center">
+                    
+                    {/*  The actual QR Code SVG container  */}
+                    <div id="qr-code-container" className="mb-4 bg-white p-4 d-inline-block" style={{ borderRadius: '16px' }}>'''
+content = re.sub(old_qr_card, new_qr_card, content)
 
 
-# 2. Update Content Section
-content_header_old = """onClick={() => { document.getElementById('content-section').classList.toggle('d-none') }}"""
-content_header_new = """onClick={() => setIsContentOpen(!isContentOpen)}"""
-text = text.replace(content_header_old, content_header_new)
+# Now fix the download buttons
+old_dl_btns = r'''</div>
 
-content_icon_old = """<i className="fas fa-chevron-down text-muted"></i>"""
-content_icon_new = """<i className={`fas ${isContentOpen ? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>"""
-text = text.replace(content_icon_old, content_icon_new, 1)
+                    <div className="d-flex gap-2 w-100 mt-2">
+                        <button className="btn btn-outline-primary flex-grow-1" id="download-png" onClick={() => handleSingleDownload(qrRef, 'png', fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo, activeTab, getQrData())}><i className="fas fa-image me-1"></i> PNG</button>
+                        <button className="btn btn-outline-primary flex-grow-1" id="download-svg" onClick={() => handleSingleDownload(qrRef, 'svg', fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo, activeTab, getQrData())}><i className="fas fa-vector-square me-1"></i> SVG</button>
+                        <button className="btn btn-outline-primary flex-grow-1" id="download-jpg" onClick={() => handleSingleDownload(qrRef, 'jpeg', fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo, activeTab, getQrData())}><i className="fas fa-file-image me-1"></i> JPG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>'''
+new_dl_btns = r'''</div>
+                    
+                    <button className="btn w-100 mb-3 fw-bold text-white shadow-sm" style={{ backgroundColor: '#664ba2', borderRadius: '12px', padding: '12px' }} onClick={(e) => e.preventDefault()}>Generate QR Code</button>
 
-content_body_old = """<div className="p-4 bg-white" id="content-section">"""
-content_body_new = """<div className={`p-4 bg-white ${isContentOpen ? '' : 'd-none'}`} id="content-section">"""
-text = text.replace(content_body_old, content_body_new)
-
-
-# 3. Update Color Section
-color_header_old = """onClick={() => { document.getElementById('color-section').classList.toggle('d-none') }}"""
-color_header_new = """onClick={() => setIsColorOpen(!isColorOpen)}"""
-text = text.replace(color_header_old, color_header_new)
-
-color_icon_old = """<i className="fas fa-chevron-down text-muted"></i>"""
-color_icon_new = """<i className={`fas ${isColorOpen ? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>"""
-text = text.replace(color_icon_old, color_icon_new, 1)
-
-color_body_old = """<div className="p-4 bg-white d-none" id="color-section">"""
-color_body_new = """<div className={`p-4 bg-white ${isColorOpen ? '' : 'd-none'}`} id="color-section">"""
-text = text.replace(color_body_old, color_body_new)
-
-
-# 4. Update Logo Section
-logo_header_old = """onClick={() => { document.getElementById('logo-section').classList.toggle('d-none') }}"""
-logo_header_new = """onClick={() => setIsLogoOpen(!isLogoOpen)}"""
-text = text.replace(logo_header_old, logo_header_new)
-
-logo_icon_old = """<i className="fas fa-chevron-down text-muted"></i>"""
-logo_icon_new = """<i className={`fas ${isLogoOpen ? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>"""
-text = text.replace(logo_icon_old, logo_icon_new, 1)
-
-logo_body_old = """<div className="p-4 bg-white d-none border-start border-end border-bottom mb-2" id="logo-section">"""
-logo_body_new = """<div className={`p-4 bg-white ${isLogoOpen ? '' : 'd-none'} border-start border-end border-bottom mb-2`} id="logo-section">"""
-text = text.replace(logo_body_old, logo_body_new)
-
-
-# 5. Update Design Section
-design_header_old = """onClick={() => { document.getElementById('design-section').classList.toggle('d-none') }}"""
-design_header_new = """onClick={() => setIsDesignOpen(!isDesignOpen)}"""
-text = text.replace(design_header_old, design_header_new)
-
-design_icon_old = """<i className="fas fa-chevron-down text-muted"></i>"""
-design_icon_new = """<i className={`fas ${isDesignOpen ? 'fa-chevron-up' : 'fa-chevron-down'} text-muted`}></i>"""
-text = text.replace(design_icon_old, design_icon_new, 1)
-
-design_body_old = """<div className="p-4 bg-white d-none border-start border-end border-bottom mb-2" id="design-section">"""
-design_body_new = """<div className={`p-4 bg-white ${isDesignOpen ? '' : 'd-none'} border-start border-end border-bottom mb-2`} id="design-section">"""
-text = text.replace(design_body_old, design_body_new)
-
+                    <div className="d-flex gap-2 w-100 mt-2">
+                        <button className="btn bg-white fw-bold w-50" style={{ borderRadius: '12px', padding: '10px', color: '#333' }} id="download-png" onClick={() => handleSingleDownload(qrRef, 'png', fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo, activeTab, getQrData())}>Download PNG</button>
+                        <button className="btn bg-white fw-bold w-50" style={{ borderRadius: '12px', padding: '10px', color: '#333' }} id="download-svg" onClick={() => handleSingleDownload(qrRef, 'svg', fgColor, bgColor, bodyShape, eyeFrameShape, eyeBallShape, centerLogo, activeTab, getQrData())}>Download SVG</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>'''
+content = re.sub(old_dl_btns, new_dl_btns, content)
 
 with open('src/app/page.js', 'w') as f:
-    f.write(text)
-
+    f.write(content)

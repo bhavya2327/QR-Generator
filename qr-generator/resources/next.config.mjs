@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',
   basePath: '/QR-Generator',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   }
