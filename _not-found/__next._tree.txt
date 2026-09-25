@@ -2,4 +2,4 @@
 :HL["/QR-Generator/_next/static/chunks/0fxi_h-xzasxo.css","style"]
 :HL["/QR-Generator/_next/static/chunks/12-scldghb3v5.css","style"]
 :HL["https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"IcPux4iXM2zwa4MgLvM9l"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"/_not-found","param":null,"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"W3pUFJL8fpByj20-xlKKY"}
